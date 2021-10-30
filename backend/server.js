@@ -14,7 +14,7 @@ MongoClient.connect(url, function (err, db) {
 
   var databaseConnection = db.db(`${DATABASE}`);
   try {
-    databaseConnection.createCollection(`${ARTICLES}`, function (err, res) {
+    databaseConnection.createCollection(`${ARTICLES}`, function (err, result) {
       console.log(`${ARTICLES} collection created!`);
       db.close();
     });
@@ -36,7 +36,7 @@ function query(queryType = "", payload = {}) {
       }
 
       databaseConnection
-        .collection(ARTICLES)
+        .collection(`${ARTICLES}`)
         .find(document, {})
         .toArray(function (err, result) {
           if (err) {
@@ -48,8 +48,8 @@ function query(queryType = "", payload = {}) {
         });
 
       databaseConnection
-        .collection(ARTICLES)
-        .insertOne(payload, function (err, res) {
+        .collection(`${ARTICLES}`)
+        .insertOne(payload, function (err, result) {
           if (err) {
             return { success: false, result: err };
           }
@@ -63,15 +63,15 @@ function query(queryType = "", payload = {}) {
       var databaseConnection = db.db(`${DATABASE}`);
 
       databaseConnection
-        .collection(ARTICLES)
+        .collection(`${ARTICLES}`)
         .find(document, {})
-        .toArray(function (err, res) {
+        .toArray(function (err, result) {
           if (err) {
             return { success: false, result: err };
           }
           console.log(result);
           db.close();
-          return { success: true, result: res };
+          return { success: true, result: result };
         });
     });
   } else {
@@ -79,7 +79,7 @@ function query(queryType = "", payload = {}) {
   }
 }
 
-app.get("/articles/", (req, response) => {
+app.get("/articles/", (request, response) => {
   try {
     payload = { document: null, data: null };
     var data = query("find", payload);
@@ -98,10 +98,10 @@ app.get("/articles/", (req, response) => {
   }
 });
 
-app.put("/articles/:name", (req, response) => {
-  req.on("end", function () {
+app.put("/articles/:name", (request, response) => {
+  request.on("end", function () {
     var put = qs.parse(body);
-    var text = put["text"];
+    var text = put["data"];
     var document = put["document"];
     payload = { document: document, data: text };
 
@@ -126,7 +126,7 @@ app.put("/articles/:name", (req, response) => {
   return result;
 });
 
-app.get("/articles/:name", (req, response) => {
+app.get("/articles/:name", (request, response) => {
   request.on("end", function () {
     var get = qs.parse(body);
     var document = get["document"];
