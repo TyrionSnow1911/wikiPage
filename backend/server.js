@@ -1,146 +1,182 @@
+import { QueryDto } from "./models/dto/queryDto";
+import { DocumentDto } from "./models/dto/documentDto";
+import { Message } from "./enum/messageEnum";
+
+const EXPRESS = require("express");
 const PORT = 9090;
-const DB_PORT = 27017;
+const MONGODB_PORT = 27017;
 const DATABASE = "database";
 const ARTICLES = "articles";
-const express = require("express");
-const app = express();
+const APP = express();
+const CONTENT_TYPE = "Content-Type";
+const JSON_APPLICATION = "application/json";
+const TEXT_HTML = "text/html";
 
 const { MongoClient } = require("mongodb");
-var url = `mongodb://localhost:${DB_PORT}/${DATABASE}`;
+var url = `mongodb://localhost:${MONGODB_PORT}/${DATABASE}`;
 
-MongoClient.connect(url, function (err, db) {
-  if (err) throw err;
+MongoClient.connect(url, function (error, db) {
+  if (error) {
+    throw error; // Client displays, 'server down'?
+  }
   console.log("Database created!");
 
   var databaseConnection = db.db(`${DATABASE}`);
   try {
-    databaseConnection.createCollection(`${ARTICLES}`, function (err, result) {
-      console.log(`${ARTICLES} collection created!`);
-      db.close();
-    });
+    databaseConnection.createCollection(
+      `${ARTICLES}`,
+      function (error, result) {
+        if (error) {
+          throw error;
+        }
+        console.log(`${ARTICLES} collection created!`);
+        console.log(result);
+        db.close();
+      }
+    );
   } catch (error) {
     console.error(error);
   }
 });
 
-function query(queryType = "", payload = {}) {
-  document = payload["document"];
-  data = payload["data"];
+export function query(queryType = "", documentDto = DocumentDto.get()) {
+  documentName = documentDto.getName();
+  documentBody = documentDto.getBody();
+  queryDto = QueryDto.get();
 
-  if (queryType == "insert") {
-    var newEntry = false;
-    MongoClient.connect(url, function (err, db) {
+  if (queryType == "PUT") {
+    MongoClient.connect(url, function (error, db) {
       var databaseConnection = db.db(`${DATABASE}`);
-      if (err) {
-        return { success: false, result: err };
+      if (error) {
+        throw error;
       }
 
       databaseConnection
         .collection(`${ARTICLES}`)
-        .find(document, {})
-        .toArray(function (err, result) {
-          if (err) {
-            return { success: false, result: err };
+        .find(documentName, {})
+        .toArray(function (error, result) {
+          if (error) {
+            throw error;
           }
           console.log(result);
           databaseConnection.close();
-          newEntry = !(result.length > 0);
+
+          if (result.length > 0) {
+            queryDto.setStatus(200);
+          } else {
+            queryDto.setStatus(201);
+          }
         });
 
       databaseConnection
         .collection(`${ARTICLES}`)
-        .insertOne(payload, function (err, result) {
-          if (err) {
-            return { success: false, result: err };
+        .insertOne(documentDto, function (error, result) {
+          if (error) {
+            throw error;
           }
-          console.log(`${document} inserted successfully.`);
+          console.log(`${documentName} inserted successfully.`);
+          queryDto.setMessage(`${documentName} inserted successfully.`);
         });
       databaseConnection.close();
-      return { success: true, result: newEntry };
+      return queryDto;
     });
-  } else if (queryType == "find") {
-    MongoClient.connect(url, function (err, db) {
+  } else if (queryType == "GET") {
+    MongoClient.connect(url, function (error, db) {
       var databaseConnection = db.db(`${DATABASE}`);
+      if (error) {
+        throw error;
+      }
 
       databaseConnection
         .collection(`${ARTICLES}`)
-        .find(document, {})
-        .toArray(function (err, result) {
-          if (err) {
-            return { success: false, result: err };
+        .find(documentName, {})
+        .toArray(function (error, document) {
+          if (error) {
+            throw error;
           }
-          console.log(result);
+          console.log(document);
           db.close();
-          return { success: true, result: result };
+          queryDto.setHeader({ CONTENT_TYPE: TEXT_HTML });
+          queryDto.setStatus(200);
+          queryDto.setMessage(Message.OK);
+          queryDto.setDocument(document);
         });
     });
   } else {
-    throw "unrecognized query type.";
+    throw "Unrecognized Query Type.";
   }
 }
 
-app.get("/articles/", (request, response) => {
+APP.get("/articles/", (request, response) => {
   try {
-    payload = { document: null, data: null };
-    var data = query("find", payload);
+    documentDto = DocumentDto.get();
+    var queryDto = query("GET", documentDto);
     result = response
-      .setHeader("Content-Type", "application/json")
-      .status(200)
-      .end(JSON.stringify(data))
-      .send({ message: "OK" });
+      .setHeader(queryDto.getHeader())
+      .status(queryDto.getStatusCode())
+      .end(JSON.stringify(queryDto.getDocument()))
+      .send({ message: queryDto.getMessage() });
+    console.log(result);
     return result;
   } catch (error) {
     result = response
-      .setHeader("Content-Type", "application/json")
-      .status(500)
-      .send({ message: String(error) });
+      .setHeader(CONTENT_TYPE, JSON_APPLICATION)
+      .status(404)
+      .send({ message: Message.NOT_FOUND });
     return result;
   }
 });
 
-app.put("/articles/:name", (request, response) => {
+APP.put("/articles/:name", (request, response) => {
   request.on("end", function () {
-    var put = qs.parse(body);
-    var text = put["data"];
-    var document = put["document"];
-    payload = { document: document, data: text };
+    try {
+      var put = qs.parse(body);
 
-    data = query("insert", payload);
+      documentDto = DocumentDto.get();
+      documentDto.setName(put["name"]);
+      documentDto.setBody(put["body"]);
 
-    var code = null;
-    var msg = "";
-    if (data["success"] == true) {
-      if (data["newEntry"]) {
-        code = 201;
-        msg = "Created";
-      } else {
-        code = 200;
-        msg = "OK";
-      }
+      queryDto = query("PUT", documentDto);
+      result = response
+        .setHeader(queryDto.getHeader())
+        .status(queryDto.getStatusCode())
+        .send({ message: queryDto.getMessage() });
+      return result;
+    } catch (error) {
+      result = response
+        .setHeader(CONTENT_TYPE, JSON_APPLICATION)
+        .status(500)
+        .send({ message: Message.INTERNAL_SERVER_ERROR });
+      return result;
     }
   });
-  result = response
-    .setHeader("Content-Type", "application/json")
-    .status(code)
-    .send({ message: msg });
-  return result;
 });
 
-app.get("/articles/:name", (request, response) => {
+APP.get("/articles/:name", (request, response) => {
   request.on("end", function () {
-    var get = qs.parse(body);
-    var document = get["document"];
-    payload = { document: document, data: null };
-    var data = query("find", payload);
-    result = response
-      .setHeader("Content-Type", "application/json")
-      .status(200)
-      .end(JSON.stringify(data))
-      .send({ message: "OK" });
-    return result;
+    try {
+      var get = qs.parse(body);
+      documentDto = DocumentDto.get();
+      documentDto.setName(get["name"]);
+      documentDto.setBody(get["body"]);
+
+      var queryDto = query("GET", documentDto);
+      result = response
+        .setHeader(queryDto.getHeader())
+        .status(queryDto.getStatusCode())
+        .end(JSON.stringify(queryDto.getDocument()))
+        .send({ message: queryDto.getMessage() });
+      return result;
+    } catch (error) {
+      result = response
+        .setHeader(CONTENT_TYPE, JSON_APPLICATION)
+        .status(404)
+        .send({ message: Message.NOT_FOUND });
+      return result;
+    }
   });
 });
 
-app.listen(PORT, () =>
+APP.listen(PORT, () =>
   console.log(`Hello world app listening on port ${PORT}!`)
 );
