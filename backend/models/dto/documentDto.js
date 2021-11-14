@@ -1,6 +1,9 @@
 import { Dto } from "./dto";
 
 export class DocumentDto extends Dto {
+  name = "";
+  body = {};
+
   constructor() {
     super();
   }

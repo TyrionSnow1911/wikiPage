@@ -1,6 +1,11 @@
 import { Dto } from "./dto";
 
-export class QueryDto extends Dto {
+export class QueryResultDto extends Dto {
+  header = {};
+  message = "";
+  statusCode = null;
+  document = {};
+
   constructor() {
     super();
   }
