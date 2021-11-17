@@ -44,14 +44,14 @@ describe("test query function.", function () {
 });
 
 describe("test endpoint: get document by name.", function () {
-  it("Should return the correct data.", function () {
+  it("should return the correct data.", function () {
     // 1. Create a new document in mongodb.
     // 2. Retrieve and verify the contents of document created in step 1.
   });
 });
 
 describe("test endpoint: get all documents.", function () {
-  it("Should return the correct data.", function () {
+  it("should return the correct data.", function () {
     // 1. Create set of new documents in mongodb.
     // 2. Retrieve all documents in mongodb.
     // 3. Verify that all documents created in step 1 are present in the list of results.
@@ -59,7 +59,7 @@ describe("test endpoint: get all documents.", function () {
 });
 
 describe("test endpoint: create and modify existing document.", function () {
-  it("Should return the correct data.", function () {
+  it("should return the correct data.", function () {
     // 1. Create new document in mongodb.
     // 2. Verify the document in step 1 is created.
     // 3. Modify the body of the document created in step 1.
