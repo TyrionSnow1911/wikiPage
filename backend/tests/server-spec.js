@@ -9,38 +9,10 @@ import axios from "axios";
 import { MessageEnum } from "../enum/messageEnum";
 import { QueryEnum } from "../enum/queryEnum";
 import { DocumentDto } from "../models/dto/documentDto";
-import { query } from "../server.js";
+import { MongoDbUtilities } from "../utilities/mongoDbUtilities";
 
 const PORT = 9090;
 const SERVER_URL = `http://localhost:${PORT}/`;
-
-describe("test query function.", function () {
-  it("should return the correct data.", function () {
-    // 1. Create new document in mongodb.
-    var documentDto = new DocumentDto().getRandomDocument();
-    var queryResultDto = query(QueryEnum.PUT, documentDto);
-    expect([200, 201]).toContain(queryResultDto.getStatusCode());
-    expect(queryResultDto.getMessage()).toBe(MessageEnum.OK);
-
-    // 2. Verify the document was created succesfully.
-    var queryResultDto = query(QueryEnum.GET, documentDto);
-    var testDocument = queryResultDto.getDocuments().shift();
-    expect(testDocument["name"]).toBe(documentDto.getName());
-    expect(testDocument["body"]).toBe(documentDto.getBody());
-
-    // 3. Modify the document body created in step 1.
-    var newDocumentBody = Math.random().toString(36).slice(2);
-    documentDto.setBody(newDocumentBody);
-    var queryResultDto = query(QueryEnum.PUT, documentDto);
-    expect([200, 201]).toContain(queryResultDto.getStatusCode());
-    expect(queryResultDto.getMessage()).toBe(MessageEnum.OK);
-
-    // 4. Retrieve and verify the new body of the document created in step 1.
-    var queryResultDto = query(QueryEnum.GET, documentDto);
-    var testDocument = queryResultDto.getDocuments().shift();
-    expect(testDocument["body"]).toBe(documentDto.getBody());
-  });
-});
 
 describe("test endpoint: get all documents.", function () {
   it("should return the correct data.", function () {
@@ -50,15 +22,24 @@ describe("test endpoint: get all documents.", function () {
     var documentDto3 = new DocumentDto().getRandomDocument();
 
     // 1. Create set of new documents in mongodb.
-    var queryResultDto1 = query(QueryEnum.PUT, documentDto1);
+    var queryResultDto1 = MongoDbUtilities.sendQuery(
+      QueryEnum.INSERT,
+      documentDto1
+    );
     expect([200, 201]).toContain(queryResultDto1.getStatusCode());
     expect(queryResultDto1.getMessage()).toBe(MessageEnum.OK);
 
-    var queryResultDto2 = query(QueryEnum.PUT, documentDto2);
+    var queryResultDto2 = MongoDbUtilities.sendQuery(
+      QueryEnum.INSERT,
+      documentDto2
+    );
     expect([200, 201]).toContain(queryResultDto2.getStatusCode());
     expect(queryResultDto2.getMessage()).toBe(MessageEnum.OK);
 
-    var queryResultDto3 = query(QueryEnum.PUT, documentDto3);
+    var queryResultDto3 = MongoDbUtilities.sendQuery(
+      QueryEnum.INSERT,
+      documentDto3
+    );
     expect([200, 201]).toContain(queryResultDto3.getStatusCode());
     expect(queryResultDto3.getMessage()).toBe(MessageEnum.OK);
 
@@ -83,7 +64,10 @@ describe("test endpoint: get document by name.", function () {
     var endpointURL = `${SERVER_URL}/articles/:name`;
     // 1. Create a new document in mongodb.
     var documentDto = new DocumentDto().getRandomDocument();
-    var queryResultDto = query(QueryEnum.PUT, documentDto);
+    var queryResultDto = MongoDbUtilities.sendQuery(
+      QueryEnum.INSERT,
+      documentDto
+    );
     expect([200, 201]).toContain(queryResultDto1.getStatusCode());
     expect(queryResultDto.getMessage()).toBe(MessageEnum.OK);
 
@@ -132,7 +116,10 @@ describe("test endpoint: create and modify existing document.", function () {
       });
 
     // 2. Verify the document in step 1 is created.
-    var queryResultDto = query(QueryEnum.GET, documentDto);
+    var queryResultDto = MongoDbUtilities.sendQuery(
+      QueryEnum.FIND,
+      documentDto
+    );
     var testDocument = queryResultDto.getDocuments().shift();
     expect(testDocument["name"]).toBe(documentDto.getName());
     expect(testDocument["body"]).toBe(documentDto.getBody());
@@ -159,7 +146,10 @@ describe("test endpoint: create and modify existing document.", function () {
       });
 
     // 4. Verify the modification in step 3.
-    var queryResultDto = query(QueryEnum.GET, documentDto);
+    var queryResultDto = MongoDbUtilities.sendQuery(
+      QueryEnum.FIND,
+      documentDto
+    );
     var testDocument = queryResultDto.getDocuments().shift();
     expect(testDocument["name"]).toBe(documentDto.getName());
     expect(testDocument["body"]).toBe(documentDto.getBody());
