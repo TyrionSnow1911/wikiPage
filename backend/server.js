@@ -172,7 +172,8 @@ app.get("/articles/:name", (request, response) => {
     response
       .setHeader(CONTENT_TYPE, JSON_APPLICATION)
       .status(404)
-      .send({ message: Message.NOT_FOUND });
+      .send({ message: Message.NOT_FOUND })
+      .end();
   }
 });
 
