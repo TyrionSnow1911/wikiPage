@@ -138,6 +138,7 @@ app.put("/articles/:name", (request, response) => {
   try {
     var documentDto = new DocumentDto().get();
     documentDto.setName(request.body.name);
+    documentDto.setBody(request.body.body);
 
     var queryResultDto = query(QueryEnum.PUT, documentDto);
     response

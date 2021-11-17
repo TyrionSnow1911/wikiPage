@@ -8,26 +8,23 @@ export class DocumentDto extends Dto {
     super();
   }
 
-  /**
-   * @returns {DocumentDto}
-   */
   get() {
     this.name = "";
     this.body = {};
     return this;
   }
 
-  /**
-   * @returns {DocumentDto}
-   */
+  getRandomDocument() {
+    this.name = Math.random().toString(36).slice(2);
+    this.body = Math.random().toString(36).slice(2);
+    return this;
+  }
+
   setName(name = "") {
     this.name = name;
     return this;
   }
 
-  /**
-   * @returns {DocumentDto}
-   */
   setBody(body = {}) {
     this.body = body;
     return this;
