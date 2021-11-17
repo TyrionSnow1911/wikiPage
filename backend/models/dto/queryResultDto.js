@@ -4,7 +4,7 @@ export class QueryResultDto extends Dto {
   header = {};
   message = "";
   statusCode = null;
-  document = {};
+  documents = [];
 
   constructor() {
     super();
@@ -14,7 +14,7 @@ export class QueryResultDto extends Dto {
     this.header = { "Content-Type": "application/json" };
     this.message = "";
     this.statusCode = null;
-    this.document = {};
+    this.documents = [];
     return this;
   }
 
@@ -27,8 +27,8 @@ export class QueryResultDto extends Dto {
   setStatus(statusCode = null) {
     this.statusCode = statusCode;
   }
-  setDocument(document = {}) {
-    this.document = document;
+  setDocuments(documents = []) {
+    this.documents = documents;
   }
 
   getHeader() {
@@ -40,7 +40,7 @@ export class QueryResultDto extends Dto {
   getStatusCode() {
     return this.statusCode;
   }
-  getDocument() {
-    return this.document;
+  getDocuments() {
+    return this.documents;
   }
 }

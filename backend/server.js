@@ -1,6 +1,7 @@
 import { QueryResultDto } from "./models/dto/queryResultDto";
 import { DocumentDto } from "./models/dto/documentDto";
-import { Message } from "./enum/messageEnum";
+import { MessageEnum } from "./enum/messageEnum";
+import { QueryEnum } from "./enum/queryEnum";
 import express from "express";
 
 const PORT = 9090;
@@ -42,10 +43,10 @@ MongoClient.connect(url, function (error, mongoClient) {
  
  * @returns {QueryResultDto} Returns Dto containing the results of a query.
  */
-export function query(queryType = "", documentDto = DocumentDto.get()) {
-  var queryResultDto = QueryResultDto.get();
+export function query(queryType = "", documentDto = new DocumentDto().get()) {
+  var queryResultDto = new QueryResultDto().get();
 
-  if (queryType == "PUT") {
+  if (queryType == QueryEnum.PUT) {
     MongoClient.connect(url, function (error, mongoClient) {
       var databaseConnection = mongoClient.db(`${DATABASE}`);
       if (error) throw error;
@@ -73,20 +74,20 @@ export function query(queryType = "", documentDto = DocumentDto.get()) {
           function (error, response) {
             if (error) throw error;
             console.log(response);
-            queryResultDto.setMessage(`${documentName} inserted successfully.`);
+            queryResultDto.setMessage(MessageEnum.OK);
           }
         );
       mongoClient.close();
       return queryResultDto;
     });
-  } else if (queryType == "GET") {
+  } else if (queryType == QueryEnum.GET) {
     MongoClient.connect(url, function (error, mongoClient) {
       var databaseConnection = mongoClient.db(`${DATABASE}`);
       if (error) throw error;
 
       var documentQuery = null;
       if (documentDto.getName() == "") {
-        // empty document query to get all documents from mongodb
+        // empty query to get all documents from mongodb
         documentQuery = {};
       } else {
         documentQuery = { name: documentDto.getName() };
@@ -95,13 +96,13 @@ export function query(queryType = "", documentDto = DocumentDto.get()) {
       databaseConnection
         .collection(`${ARTICLES}`)
         .find(documentQuery, {})
-        .toArray(function (error, document) {
+        .toArray(function (error, documents) {
           if (error) throw error;
-          console.log(document);
+          console.log(documents);
           queryResultDto.setHeader({ CONTENT_TYPE: TEXT_HTML });
           queryResultDto.setStatus(200);
-          queryResultDto.setMessage(Message.OK);
-          queryResultDto.setDocument(document.shift());
+          queryResultDto.setMessage(MessageEnum.OK);
+          queryResultDto.setDocuments(documents);
           mongoClient.close();
           return queryResultDto;
         });
@@ -113,13 +114,13 @@ export function query(queryType = "", documentDto = DocumentDto.get()) {
 
 app.get("/articles/", (request, response) => {
   try {
-    var queryResultDto = query("GET");
+    var queryResultDto = query(QueryEnum.GET);
     var result = response
       .setHeader(queryResultDto.getHeader())
       .status(queryResultDto.getStatusCode())
       .send({
         message: queryResultDto.getMessage(),
-        data: JSON.stringify(queryResultDto.getDocument()),
+        data: JSON.stringify(queryResultDto.getDocuments()),
       })
       .end();
     console.log(result);
@@ -128,17 +129,17 @@ app.get("/articles/", (request, response) => {
     var result = response
       .setHeader(CONTENT_TYPE, JSON_APPLICATION)
       .status(404)
-      .send({ message: Message.NOT_FOUND })
+      .send({ message: MessageEnum.NOT_FOUND })
       .end();
   }
 });
 
 app.put("/articles/:name", (request, response) => {
   try {
-    var documentDto = DocumentDto.get();
+    var documentDto = new DocumentDto().get();
     documentDto.setName(request.body.name);
 
-    var queryResultDto = query("PUT", documentDto);
+    var queryResultDto = query(QueryEnum.PUT, documentDto);
     response
       .setHeader(queryResultDto.getHeader())
       .status(queryResultDto.getStatusCode())
@@ -149,22 +150,22 @@ app.put("/articles/:name", (request, response) => {
     response
       .setHeader(CONTENT_TYPE, JSON_APPLICATION)
       .status(500)
-      .send({ message: Message.INTERNAL_SERVER_ERROR })
+      .send({ message: MessageEnum.INTERNAL_SERVER_ERROR })
       .end();
   }
 });
 
 app.get("/articles/:name", (request, response) => {
   try {
-    var documentDto = DocumentDto.get();
+    var documentDto = new DocumentDto().get();
     documentDto.setName(request.body.name);
-    var queryResultDto = query("GET", documentDto);
+    var queryResultDto = query(QueryEnum.GET, documentDto);
     response
       .setHeader(queryResultDto.getHeader())
       .status(queryResultDto.getStatusCode())
       .send({
         message: queryResultDto.getMessage(),
-        data: JSON.stringify(queryResultDto.getDocument()),
+        data: JSON.stringify(queryResultDto.getDocuments().shift()),
       })
       .end();
   } catch (error) {
@@ -172,7 +173,7 @@ app.get("/articles/:name", (request, response) => {
     response
       .setHeader(CONTENT_TYPE, JSON_APPLICATION)
       .status(404)
-      .send({ message: Message.NOT_FOUND })
+      .send({ message: MessageEnum.NOT_FOUND })
       .end();
   }
 });

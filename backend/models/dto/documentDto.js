@@ -8,18 +8,29 @@ export class DocumentDto extends Dto {
     super();
   }
 
+  /**
+   * @returns {DocumentDto}
+   */
   get() {
     this.name = "";
     this.body = {};
     return this;
   }
 
+  /**
+   * @returns {DocumentDto}
+   */
   setName(name = "") {
     this.name = name;
+    return this;
   }
 
+  /**
+   * @returns {DocumentDto}
+   */
   setBody(body = {}) {
     this.body = body;
+    return this;
   }
 
   getName() {
