@@ -1,6 +1,6 @@
 // Tests Coverage.
 // 1. test query function
-// 2. test get all articles
+// 2. test get all documents
 // 3. test create new document
 // 4. test modify existing document
 // 5. test get document
@@ -14,8 +14,8 @@ const TEST_DOCUMENT_1_NAME = "test_document_1_name";
 const TEST_DOCUMENT_1_BODY_1 = "test_document_1_body_1";
 const TEST_DOCUMENT_1_BODY_2 = "test_document_1_body_1";
 
-describe("Tests query function.", function () {
-  it("Should return the correct data.", function () {
+describe("test query function.", function () {
+  it("should return the correct data.", function () {
     // 1. Create new document in mongodb.
     var documentDto = new DocumentDto().get();
     documentDto.setName(`${TEST_DOCUMENT_1_NAME}`);
@@ -43,22 +43,22 @@ describe("Tests query function.", function () {
   });
 });
 
-describe("Tests endpoint for retrieving document by name.", function () {
+describe("test endpoint: get document by name.", function () {
   it("Should return the correct data.", function () {
     // 1. Create a new document in mongodb.
     // 2. Retrieve and verify the contents of document created in step 1.
   });
 });
 
-describe("Tests endpoint for retrieving all articles.", function () {
+describe("test endpoint: get all documents.", function () {
   it("Should return the correct data.", function () {
-    // 1. Create set of new articles in mongodb.
-    // 2. Retrieve all articles in mongodb.
-    // 3. Verify that all articles created in step 1 are present in the list of results.
+    // 1. Create set of new documents in mongodb.
+    // 2. Retrieve all documents in mongodb.
+    // 3. Verify that all documents created in step 1 are present in the list of results.
   });
 });
 
-describe("Tests endpoint for creating and modifying existing document.", function () {
+describe("test endpoint: create and modify existing document.", function () {
   it("Should return the correct data.", function () {
     // 1. Create new document in mongodb.
     // 2. Verify the document in step 1 is created.
