@@ -1,186 +1,39 @@
-// TODO: Re-write unit tests.
+// Tests Coverage.
+// 1. test query function
+// 2. test get all articles
+// 3. test create new article
+// 4. test modify existing article
+// 5. test get article
 
-// const https = require("https");
-// const ARTICLE_1 = "Article 1";
+describe("Tests query function.", function () {
+  it("Should return the correct data.", function () {
+    // 1. Create new article in mongodb.
+    // 2. Retrieve and verify the article created in step 1.
+    // 3. Modify the article created in step 1.
+    // 4. Retrieve and verify the new contents of the article created in step 1.
+  });
+});
 
-// function createArticles(articles = []) {
-//   var n = articles.length;
-// }
-// function deleteArticles(articles = []) {}
+describe("Tests endpoint for retrieving article by name.", function () {
+  it("Should return the correct data.", function () {
+    // 1. Create a new article in mongodb.
+    // 2. Retrieve and verify the name and body of article created in step 1.
+  });
+});
 
-// describe("Test get all articles.", function () {
-//   it("The endpoint should return all articles names from server.", function () {
-//     // TODO: add some articles on the back-end
-//     // Delete them once testing is done
+describe("Tests endpoint for retrieving all articles.", function () {
+  it("Should return the correct data.", function () {
+    // 1. Create set of new articles in mongodb.
+    // 2. Retrieve all articles in mongodb.
+    // 3. Verify that all articles created in step 1 are present in the list of results.
+  });
+});
 
-//     var result = null;
-//     var code = null;
-//     var message = null;
-
-//     var expectedResult = [];
-//     var expectedCode = 200;
-//     var expectedMessage = "OK";
-
-//     const options = {
-//       hostname: "localhost",
-//       port: 9090,
-//       path: "/articles/",
-//       method: "GET",
-//     };
-
-//     const req = https.request(options, (res) => {
-//       console.log(`statusCode: ${res.statusCode}`);
-
-//       res.on("data", (d) => {
-//         process.stdout.write(d);
-//         result = d["data"];
-//         message = d["message"];
-//         code = d["status"];
-//       });
-//     });
-
-//     req.on("error", (error) => {
-//       console.error(error);
-//     });
-
-//     req.end();
-
-//     expect(result).toBe(expectedResult);
-//     expect(code).toBe(expectedCode);
-//     expect(message).toBe(expectedMessage);
-//   });
-// });
-
-// describe("Test create article.", function () {
-//   it("The endpoint will create new article with new data.", function () {
-//     var message = null;
-//     var code = null;
-//     var expectedMessage = "Created";
-//     var expectedCode = 201;
-
-//     const data = new TextEncoder().encode(
-//       JSON.stringify({
-//         name: `${ARTICLE_1}`,
-//         data: "Data for article 1.",
-//       })
-//     );
-//     const options = {
-//       hostname: "localhost",
-//       port: 9090,
-//       path: `/articles/${ARTICLE_1}`,
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//         "Content-Length": data.length,
-//       },
-//     };
-//     const req = https.request(options, (res) => {
-//       console.log(`statusCode: ${res.statusCode}`);
-
-//       res.on("data", (d) => {
-//         process.stdout.write(d);
-//       });
-//     });
-
-//     req.on("error", (error) => {
-//       console.error(error);
-//     });
-
-//     req.write(data);
-//     req.end();
-//     expect(code).toBe(expectedCode);
-//     expect(message).toBe(expectedMessage);
-//   });
-// });
-
-// describe("Test update article.", function () {
-//   it("The endpoint will update existing article with new data.", function () {
-//     // TODO: Create an article on the back end
-//     // Execute put request, and verify the article contents were updated.
-//     // Delete article once test is done.
-//     var message = null;
-//     var code = null;
-//     var expectedMessage = "OK";
-//     var expectedCode = 200;
-
-//     const data = new TextEncoder().encode(
-//       JSON.stringify({
-//         name: `${ARTICLE_1}`,
-//         data: "Updated data for article 1.",
-//       })
-//     );
-//     const options = {
-//       hostname: "localhost",
-//       port: 9090,
-//       path: `/articles/${ARTICLE_1}`,
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//         "Content-Length": data.length,
-//       },
-//     };
-//     const req = https.request(options, (res) => {
-//       console.log(`statusCode: ${res.statusCode}`);
-
-//       res.on("data", (d) => {
-//         process.stdout.write(d);
-//       });
-//     });
-
-//     req.on("error", (error) => {
-//       console.error(error);
-//     });
-
-//     req.write(data);
-//     req.end();
-//     expect(code).toBe(expectedCode);
-//     expect(message).toBe(expectedMessage);
-//   });
-// });
-
-// describe("Test get article.", function () {
-//   it("The endpoint should return requested article from server.", function () {
-//     // TODO: Add an article on the back-end.
-//     // Verify article contents.
-//     // Delete article once testing is done.
-//     var code = null;
-//     var message = null;
-//     var articleName = null;
-//     var content = null;
-
-//     var expectedArticleName = `${ARTICLE_1}`;
-//     var expectedContent = "Updated data for article 1.";
-//     var expectedCode = 200;
-//     var expectedMessage = "OK";
-
-//     const options = {
-//       hostname: "localhost",
-//       port: 9090,
-//       path: `/articles/${ARTICLE_1}`,
-//       method: "GET",
-//     };
-
-//     const req = https.request(options, (res) => {
-//       console.log(`statusCode: ${res.statusCode}`);
-
-//       res.on("data", (d) => {
-//         process.stdout.write(d);
-//         articleName = d["data"]["document"];
-//         content = d["data"]["data"];
-//         message = d["message"];
-//         code = d["status"];
-//       });
-//     });
-
-//     req.on("error", (error) => {
-//       console.error(error);
-//     });
-
-//     req.end();
-
-//     expect(articleName).toBe(expectedArticleName);
-//     expect(content).toBe(expectedContent);
-//     expect(code).toBe(expectedCode);
-//     expect(message).toBe(expectedMessage);
-//   });
-// });
+describe("Tests endpoint for creating and modifying existing article.", function () {
+  it("Should return the correct data.", function () {
+    // 1. Create new article in mongodb.
+    // 2. Verify the article in step 1 is created.
+    // 3. Modify the body of the article created in step 1.
+    // 4. Verify the modification in step 3.
+  });
+});
